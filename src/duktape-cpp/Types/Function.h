@@ -156,9 +156,9 @@ struct Type<std::function<R(A...)>> {
     template <class RR, class ... AA>
     static void assignFunction(std::function<RR(AA...)> &val, duk_context *dukPtr, int heapIdx) {
         JSFunction<RR, AA...> func(dukPtr, heapIdx);
-        auto fn = [f = std::move(func)] (AA&& ... args) -> RR {
+        auto fn = [=] (AA&& ... args) -> RR {
             try {
-                return f.call(std::forward<AA>(args)...);
+                return func.call(std::forward<AA>(args)...);
             }
             catch (ScriptEvaluationExcepton &e) {
                 printf("%s", e.what());

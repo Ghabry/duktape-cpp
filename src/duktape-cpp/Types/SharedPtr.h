@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../Utils/ClassInfo.h"
+#include "../Utils/Cpp11Compat.h"
 #include "../Utils/Helpers.h"
 #include "../Utils/Inspect.h"
 
@@ -25,7 +26,7 @@ struct SptrBox {
 template <class T>
 struct SptrBox<T, true> {
     static std::unique_ptr<BoxBase> make(std::shared_ptr<T> const &value) {
-        return std::make_unique<Box<std::shared_ptr<typename BaseClass<T>::type>>>(value);
+        return duk::make_unique<Box<std::shared_ptr<typename BaseClass<T>::type>>>(value);
     }
 
     static void assign(BoxBase const &box, std::shared_ptr<T> &value) {
@@ -39,7 +40,7 @@ struct SptrBox<T, false> {
     typedef ClearType<T> TC;
 
     static std::unique_ptr<BoxBase> make(std::shared_ptr<TC> const &value) {
-        return std::make_unique<Box<std::shared_ptr<TC>>>(value);
+        return duk::make_unique<Box<std::shared_ptr<TC>>>(value);
     }
 
     static void assign(BoxBase const &box, std::shared_ptr<T> &value) {

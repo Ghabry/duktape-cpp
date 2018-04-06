@@ -10,7 +10,7 @@ It is currently work-in-progress and may lack some features, so feel free to to 
 # Getting started
 
 Requirements:
-- Modern C++ compiler with C++14 support
+- Modern C++ compiler with C++11 support (C++14 for the examples and tests)
 
 duktape-cpp is a header-only library, so all you need is to just add source
 files from `src` directory to you project and `#include "duktape-cpp/DuktapeCpp.h"`.

@@ -6,6 +6,7 @@
 #include "Context.h"
 
 #include "./Type.h"
+#include "./Utils/Cpp11Compat.h"
 #include "./Utils/Helpers.h"
 
 #include "PushObjectInspector.h"
@@ -17,13 +18,13 @@ namespace duk { namespace details {
 template <int StackIdx, class C, class ... A>
 struct ConstructorDispatcher {
     duk_ret_t dispatch(std::shared_ptr<C> (*constructor)(A...), duk::Context &d) {
-        std::shared_ptr<C> res = call(constructor, d, std::index_sequence_for<A...>{});
+        std::shared_ptr<C> res = call(constructor, d, duk::index_sequence_for<A...>{});
         Type<std::shared_ptr<ClearType<C>>>::push(d, res);
         return 1;
     }
 
     template<std::size_t ... I>
-    std::shared_ptr<C> call(std::shared_ptr<C> (*constructor)(A...), duk::Context &d, std::index_sequence<I...>) {
+    std::shared_ptr<C> call(std::shared_ptr<C> (*constructor)(A...), duk::Context &d, duk::index_sequence<I...>) {
         return constructor(getArg<A, I + StackIdx>(d)...);
     }
 
@@ -50,7 +51,7 @@ inline duk_ret_t Constructor<C, A...>::func(duk_context *d) {
       duk_error(d, DUK_RET_TYPE_ERROR, "Constructor must be called with 'new'.");
       return DUK_RET_TYPE_ERROR;
    }
-    
+
    duk_push_global_stash(d);
    duk_get_prop_string(d, -1, "self_ptr");
    duk::Context *ctx = reinterpret_cast<duk::Context*>(duk_get_pointer(d, -1));
@@ -75,13 +76,13 @@ inline duk_ret_t Constructor<C, A...>::func(duk_context *d) {
 template <int StackIdx, class C, class ... A>
 struct ConstructorDispatcherUnique {
     duk_ret_t dispatch(std::unique_ptr<C> (*constructor)(A...), duk::Context &d) {
-        std::unique_ptr<C> res = call(constructor, d, std::index_sequence_for<A...>{});
+        std::unique_ptr<C> res = call(constructor, d, duk::index_sequence_for<A...>{});
         Type<std::unique_ptr<ClearType<C>>>::push(d, std::move(res));
         return 1;
     }
 
     template<std::size_t ... I>
-    std::unique_ptr<C> call(std::unique_ptr<C> (*constructor)(A...), duk::Context &d, std::index_sequence<I...>) {
+    std::unique_ptr<C> call(std::unique_ptr<C> (*constructor)(A...), duk::Context &d, duk::index_sequence<I...>) {
         return constructor(getArg<A, I + StackIdx>(d)...);
     }
 
@@ -108,7 +109,7 @@ inline duk_ret_t ConstructorUnique<C, A...>::func(duk_context *d) {
       duk_error(d, DUK_RET_TYPE_ERROR, "Constructor must be called with 'new'.");
       return DUK_RET_TYPE_ERROR;
    }
-    
+
    duk_push_global_stash(d);
    duk_get_prop_string(d, -1, "self_ptr");
    duk::Context *ctx = reinterpret_cast<duk::Context*>(duk_get_pointer(d, -1));

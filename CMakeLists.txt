@@ -15,6 +15,6 @@ add_subdirectory(dependencies/duktape)
 
 add_subdirectory(tests)
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${projname} PROPERTY CXX_STANDARD 11)
 
 add_subdirectory(examples)

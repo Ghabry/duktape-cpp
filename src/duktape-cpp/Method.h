@@ -5,6 +5,7 @@
 
 #include <duktape.h>
 
+#include "./Utils/Cpp11Compat.h"
 #include "./Utils/Helpers.h"
 
 #include "Context.h"
@@ -71,13 +72,13 @@ struct ArgGetter<A const &, Index, false> {
 template <class C, class R, class ... A>
 struct MethodDispatcher {
     duk_ret_t dispatch(std::function<R(C*, A...)> const &func, C* obj, duk::Context &d) {
-        R res = call(func, obj, d, std::index_sequence_for<A...>{});
+        R res = call(func, obj, d, duk::index_sequence_for<A...>{});
         Type<ClearType<R>>::push(d, std::move(res));
         return 1;
     }
 
     template<std::size_t ... I>
-    R call(std::function<R(C*, A...)> const &func, C* obj, duk::Context &d, std::index_sequence<I...>) {
+    R call(std::function<R(C*, A...)> const &func, C* obj, duk::Context &d, duk::index_sequence<I...>) {
         return func(obj, ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };
@@ -85,12 +86,12 @@ struct MethodDispatcher {
 template <class C, class ... A>
 struct MethodDispatcher<C, void, A...> {
     duk_ret_t dispatch(std::function<void(C*, A...)> const &func, C* obj, duk::Context &d) {
-        call(func, obj, d, std::index_sequence_for<A...>{});
+        call(func, obj, d, duk::index_sequence_for<A...>{});
         return 0;
     }
 
     template<std::size_t ...I>
-    void call(std::function<void(C*, A...)> const &func, C* obj, duk::Context &d, std::index_sequence<I...>) {
+    void call(std::function<void(C*, A...)> const &func, C* obj, duk::Context &d, duk::index_sequence<I...>) {
         func(obj, ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };
@@ -119,13 +120,13 @@ struct MethodDispatcher<C, R> {
 template <class R, class ... A>
 struct StaticMethodDispatcher {
     duk_ret_t dispatch(std::function<R(A...)> const &func, duk::Context &d) {
-        R res = call(func, d, std::index_sequence_for<A...>{});
+        R res = call(func, d, duk::index_sequence_for<A...>{});
         Type<ClearType<R>>::push(d, std::move(res));
         return 1;
     }
 
     template<std::size_t ... I>
-    R call(std::function<R(A...)> const &func, duk::Context &d, std::index_sequence<I...>) {
+    R call(std::function<R(A...)> const &func, duk::Context &d, duk::index_sequence<I...>) {
         return func(ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };
@@ -133,12 +134,12 @@ struct StaticMethodDispatcher {
 template <class ... A>
 struct StaticMethodDispatcher<void, A...> {
     duk_ret_t dispatch(std::function<void(A...)> const &func, duk::Context &d) {
-        call(func, d, std::index_sequence_for<A...>{});
+        call(func, d, duk::index_sequence_for<A...>{});
         return 0;
     }
 
     template<std::size_t ...I>
-    void call(std::function<void(A...)> const &func, duk::Context &d, std::index_sequence<I...>) {
+    void call(std::function<void(A...)> const &func, duk::Context &d, duk::index_sequence<I...>) {
         func(ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };

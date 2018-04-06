@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "../Utils/ClassInfo.h"
+#include "../Utils/Cpp11Compat.h"
 #include "../Utils/Helpers.h"
 #include "../Utils/Inspect.h"
 
@@ -39,7 +40,7 @@ struct MakeUptrBox {
 template <class T>
 struct MakeUptrBox<T, true> {
     static std::unique_ptr<BoxBase> make(std::unique_ptr<T> value) {
-        return std::make_unique<Box<std::unique_ptr<typename BaseClass<T>::type>>>(std::move(value));
+        return duk::make_unique<Box<std::unique_ptr<typename BaseClass<T>::type>>>(std::move(value));
     }
 
     static void assign(BoxBase &box, std::unique_ptr<T> &value) {
@@ -62,7 +63,7 @@ struct MakeUptrBox<T, false> {
     typedef ClearType<T> TC;
 
     static std::unique_ptr<BoxBase> make(std::unique_ptr<TC> value) {
-        return std::make_unique<Box<std::unique_ptr<TC>>>(std::move(value));
+        return duk::make_unique<Box<std::unique_ptr<TC>>>(std::move(value));
     }
 
     static void assign(BoxBase &box, std::unique_ptr<T> &value) {

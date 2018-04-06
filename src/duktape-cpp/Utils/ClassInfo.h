@@ -10,17 +10,17 @@ namespace duk {
 template <typename T>
 struct ClassName {
     static constexpr bool isDefined() { return false; };
-    static constexpr auto value = "UnknownClass";
+    static constexpr const char* value = "UnknownClass";
 };
 
 template <typename T>
 struct ShortClassName {
     static constexpr bool isDefined() { return false; }
-    static constexpr auto value = ClassName<T>::value;
+    static constexpr const char* value = ClassName<T>::value;
 };
 
 template <class T>
-constexpr auto GetClassName() {
+constexpr const char* GetClassName() {
     static_assert(ClassName<T>::isDefined(), "ClassName not defined");
     return ClassName<T>::value;
 }
@@ -55,7 +55,7 @@ struct IsPolymorphic {
     template <> \
     struct ClassName<T> { \
         static constexpr bool isDefined() { return true; }; \
-        static constexpr auto value = #T; \
+        static constexpr const char* value = #T; \
     };}
 
 /**
@@ -66,7 +66,7 @@ struct IsPolymorphic {
     template <> \
     struct ShortClassName<T> { \
         static constexpr bool isDefined() { return true; } \
-        static constexpr auto value = shortName; \
+        static constexpr const char* value = shortName; \
     };}
 
 #define DUK_CPP_DEF_BASE_CLASS(Type, Base) \
